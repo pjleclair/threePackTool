@@ -1,8 +1,9 @@
 from google.oauth2.service_account import Credentials
 import googleapiclient.discovery
+import os
 
 def main():
-    path = "C:\\Users\\Phil (Rater8)\\Documents\\Scripts\\threePackTool\\credentials.json"
+    path = os.getcwd() + "\credentials.json"
     credentials = Credentials.from_service_account_file(
         path,
         scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
