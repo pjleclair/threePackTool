@@ -11,7 +11,7 @@ def main():
     #initialize headless chrome driver
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options) #options=chrome_options
 
     #initialize search variables (to be replaced with values pulled from Google Sheets)
     tenant = 'Raleigh Foot & Ankle'
@@ -54,7 +54,7 @@ def main():
     left = location['x'] - margin
     top = location['y'] - margin / 2
     right = location['x'] + width
-    bottom = location['y'] + height + margin
+    bottom = location['y'] + height + margin / 2
     screenshot = screenshot.crop((left,top,right,bottom))
 
     #set filepath using current working directory, create directory for tenant if not existing, save screenshot
@@ -62,7 +62,7 @@ def main():
     if not os.path.exists(path):
         os.makedirs(path)
     screenshot.save(f'{path}/3pack.png')
-
+    
     driver.quit()
 
 if __name__ == '__main__':
