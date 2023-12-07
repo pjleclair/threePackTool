@@ -1,2 +1,4 @@
 /images
 credentials.json
+.venv
+/__pycache__
