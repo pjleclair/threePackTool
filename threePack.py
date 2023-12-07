@@ -40,10 +40,6 @@ class Driver():
                 width = listing.size['width']
         height = height + places.size["height"]
 
-        print(location)
-        print(f'height: {height}')
-        print(f'width: {width}')
-
         #initialize screenshot
         screenshot = self.driver.get_screenshot_as_png()
         screenshot = Image.open(BytesIO(screenshot))
