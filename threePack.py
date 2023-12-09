@@ -1,4 +1,5 @@
 import os
+from datetime import date
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -54,9 +55,11 @@ class Driver():
 
         #set filepath using current working directory, create directory for tenant if not existing, save screenshot
         path = os.getcwd() + f'/images/{tenant}'
+        today = str(date.today())
+        img_path = f'{path}/3pack - {today}.png'
         if not os.path.exists(path):
             os.makedirs(path)
-        screenshot.save(f'{path}/3pack.png')
+        screenshot.save(img_path)
         print(f'Saved threePack for {tenant}')
     
     def quit(self):
