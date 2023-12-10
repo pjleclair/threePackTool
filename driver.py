@@ -34,10 +34,10 @@ class Driver():
         '''
         # initialize headless chrome driver
         chrome_options = Options()
-        # chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--headless=new")
         chrome_options.add_argument('--disable-canvas-aa')
         chrome_options.add_argument('--disable-webgl')
-        # chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         self.driver = webdriver.Chrome(options=chrome_options) #options=chrome_options
         self.driver.set_window_size(1920,1080)
     
