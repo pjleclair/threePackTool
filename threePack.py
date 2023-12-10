@@ -1,15 +1,35 @@
+# Phillip LeClair
+# CS 5001
+# Final Project
+# 12/10/2023
+# threePack.py runs the webdriver and saves the relevant threePack in a .png file
+
+
+# import os to get working directory for saving files
 import os
+# import date to append current date to screenshot filename
 from datetime import date
 
+# import selenium to run the webdriver, create webdriver options, and search page elements
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+
+# import Image & BytesIO to crop & save screenshot
 from PIL import Image
 from io import BytesIO
 
 class Driver():
+    ''' Driver class creates an object to execute threePack scraping
+    Parameters: None
+    Attributes: driver - WebDriver
+    '''
     def __init__(self):
+        ''' Init function creates the Driver object
+        Parameters: self
+        Attributes: driver - WebDriver
+        '''
         #initialize headless chrome driver
         chrome_options = Options()
         chrome_options.add_argument("--headless=new")
@@ -19,6 +39,15 @@ class Driver():
         self.driver = webdriver.Chrome(options=chrome_options) #options=chrome_options
     
     def drive(self, tenant, city_state, specialty, title = 'Doctor'):
+        ''' drive executes the search and screenshot functionality
+        Parameters:
+            - self
+            - tenant: string
+            - city_state: string
+            - specialty: string
+            - title: string (optional)
+        Returns a dictionary with height, width, and screenshot_size keys
+        '''
         self.driver.get('http://www.google.com')
 
         search_box = self.driver.find_element(By.ID,'APjFqb')
@@ -61,11 +90,16 @@ class Driver():
             os.makedirs(path)
         screenshot.save(img_path)
         print(f'Saved threePack for {tenant}')
+        return {'height': height, 'width': width, 'screenshot_size': screenshot.size}
     
     def quit(self):
         self.driver.quit()
 
 def main():
+    ''' Main function executes an example use of Driver
+    Parameters: None
+    Returns nothing
+    '''
     driver = Driver()
     tenant = 'Raleigh Foot & Ankle'
     city_state = 'Raleigh, NC'
