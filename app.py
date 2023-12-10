@@ -52,7 +52,7 @@ def runApplication():
             print(f'\t- {fail}')
     # after the script finishes, terminate the driver and clear the Google Sheet
     driver.quit()
-    service.clearSheet()
+    # service.clearSheet()
 
 def main():
     ''' Main function runs the application
