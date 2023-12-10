@@ -2,65 +2,111 @@
 # CS 5001
 # Final Project
 # 12/10/2023
-# driver.py runs the application using Driver & DataService
+# driver.py runs the webdriver and saves the relevant threePack in a .png file
 
 
-# import Driver and DataService to execute the application
-from threePack import Driver
-from requestData import DataService
+# import os to get working directory for saving files
+import os
+# import date to append current date to screenshot filename
+from datetime import date
+
+# import selenium to run the webdriver, create webdriver options, and search page elements
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 
-def runApplication():
-    ''' runApplication imports data from Google Sheets and runs the driver
+# import Image & BytesIO to crop & save screenshot
+from PIL import Image
+from io import BytesIO
+
+class Driver():
+    ''' Driver class creates an object to execute threePack scraping
     Parameters: None
-    Returns nothing
+    Attributes: driver - WebDriver
     '''
-
-    # initialize data service, spreadsheet_id, and fails
-    spreadsheet_id='1ZbTHgQc5p61oDLcAHoj2iAWcfgYXJJibnCFMo9boShI'
-    service = DataService(spreadsheet_id)
-    fails = []
-
-    # try to get data from Google Sheets, otherwise print error
-    try:
-        data = service.getData()
-    except:
-        print("Error fetching data!")
-        return
-
-    # if there is nothing in the sheet besides headers, print a message and stop
-    if len(data['values']) <= 1:
-        print('No new data in sheet!')
-        return
+    def __init__(self):
+        ''' Init function creates the Driver object
+        Parameters: self
+        Attributes: driver - WebDriver
+        '''
+        #initialize headless chrome driver
+        chrome_options = Options()
+        chrome_options.add_argument("--headless=new")
+        # chrome_options.add_argument('--disable-canvas-aa')
+        # chrome_options.add_argument('--disable-webgl')
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        self.driver = webdriver.Chrome(options=chrome_options) #options=chrome_options
     
-    # if there is data, initialize the driver and iterate through the client list, executing the driver each time
-    # if the driver fails, print a message and append the client name to the fails list
-    driver = Driver()
-    for practice in data['values'][1:]:
-        try:
-            driver.drive(practice[0], practice[1], practice[2])
-        except:
-            print(f'Error creating threePack for {practice[0]}')
-            fails.append(practice[0])
+    def drive(self, tenant, city_state, specialty, title = 'Doctor'):
+        ''' drive executes the search and screenshot functionality
+        Parameters:
+            - self
+            - tenant: string
+            - city_state: string
+            - specialty: string
+            - title: string (optional)
+        Returns a dictionary with height, width, and screenshot_size keys
+        '''
+        self.driver.get('http://www.google.com')
 
-    print('Complete!')
+        search_box = self.driver.find_element(By.ID,'APjFqb')
+        search_box.send_keys(f'best {specialty} {title} in {city_state}')
+        search_box.submit()
 
-    # if there are fails, print them to the user
-    if len(fails) > 0:
-        print('ThreePack encountered errors in the following...')
-        for fail in fails:
-            print(f'\t- {fail}')
-    # after the script finishes, terminate the driver and clear the Google Sheet
-    driver.quit()
-    service.clearSheet()
+        #find places header to anchor screenshot location
+        places = self.driver.find_element(By.CLASS_NAME, 'YzSd')
+        location = places.location
+
+        #iterate through top listings to determine size of screenshot
+        listings = self.driver.find_elements(By.CLASS_NAME, 'VkpGBb')
+        height = 0
+        width = 0
+        for listing in listings:
+            # print(f'Result: {listing.text}')
+            # print(f'\tSize: {listing.size}')
+            height += listing.size['height']
+            if listing.size['width'] > width:
+                width = listing.size['width']
+        height = height + places.size["height"]
+
+        #initialize screenshot
+        screenshot = self.driver.get_screenshot_as_png()
+        screenshot = Image.open(BytesIO(screenshot))
+
+        #set crop values, crop screenshot
+        margin = 50
+        left = location['x'] - margin
+        top = location['y'] - margin / 2
+        right = location['x'] + width
+        bottom = location['y'] + height + margin / 2
+        screenshot = screenshot.crop((left,top,right,bottom))
+
+        #set filepath using current working directory, create directory for tenant if not existing, save screenshot
+        path = os.getcwd() + f'/images/{tenant}'
+        today = str(date.today())
+        img_path = f'{path}/3pack - {today}.png'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        screenshot.save(img_path)
+        print(f'Saved threePack for {tenant}')
+        return {'height': height, 'width': width, 'screenshot_size': screenshot.size}
+    
+    def quit(self):
+        self.driver.quit()
 
 def main():
-    ''' Main function runs the application
+    ''' Main function executes an example use of Driver
     Parameters: None
     Returns nothing
     '''
-    runApplication()
-
+    driver = Driver()
+    tenant = 'Raleigh Foot & Ankle'
+    city_state = 'Raleigh, NC'
+    specialty = 'Foot & Ankle'
+    # title = 'Doctor' -- optional
+    driver.drive(tenant, city_state, specialty)
+    driver.quit()
 
 if __name__ == '__main__':
     main()

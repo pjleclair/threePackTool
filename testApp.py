@@ -2,17 +2,17 @@
 # CS 5001
 # Final Project
 # 12/10/2023
-# TestDriver.py executes a series of tests to ensure functionality of the project
+# testApp.py executes a series of tests to ensure functionality of the project
 
 
 # import unittest to create the testing framework
 import unittest
 
 # import Driver to execute the webdriver
-from threePack import Driver
+from driver import Driver
 
 # import DataService to send API requests to Google Sheets
-from requestData import DataService
+from dataService import DataService
 
 class TestDriver(unittest.TestCase):
     ''' TestDriver class creates a series of tests
@@ -33,9 +33,9 @@ class TestDriver(unittest.TestCase):
         Returns nothing
         '''
         driver = Driver()
-        tenant = 'Raleigh Foot & Ankle'
-        city_state = 'Raleigh, NC'
-        specialty = 'Foot & Ankle'
+        tenant = 'Aspen Valley Hospital'
+        city_state = 'Aspen, CO'
+        specialty = 'Medical'
         # title = 'Doctor' -- optional
         results = driver.drive(tenant, city_state, specialty)
         height, width = results['screenshot_size']

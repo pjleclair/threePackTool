@@ -2,7 +2,7 @@
 # CS 5001
 # Final Project
 # 12/10/2023
-# requestData.py interacts with Sheets API to fetch data to power the webdriver
+# dataService.py interacts with Sheets API to fetch data to power the webdriver
 
 
 # import Google oauth2 and googleapiclient to interact with Sheets API
