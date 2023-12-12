@@ -69,7 +69,7 @@ class Driver():
         # iterate through top listings to determine size of screenshot
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'VkpGBb')))
         listings = self.driver.find_elements(By.CLASS_NAME, 'VkpGBb')
-        
+        # location = places.location
         height = 0
         width = 0
         for listing in listings:
@@ -84,7 +84,7 @@ class Driver():
         screenshot = self.driver.get_screenshot_as_png()
         screenshot = Image.open(BytesIO(screenshot))
 
-        # set crop values, crop screenshot
+        # # set crop values, crop screenshot
         # margin = 50
         # left = location['x'] - margin
         # top = location['y'] - margin / 2
