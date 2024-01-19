@@ -61,8 +61,24 @@ def main():
     Parameters: None
     Returns nothing
     '''
-    service = DataService(spreadsheet_id='1ZbTHgQc5p61oDLcAHoj2iAWcfgYXJJibnCFMo9boShI')
-    print(service.getData())
+    #MK: 1zNHLVX9V1TsckqhpzMWzkhDyLQ4bIDUmaJ6uKlTpJCM
+    #Test: 1ZbTHgQc5p61oDLcAHoj2iAWcfgYXJJibnCFMo9boShI
+    service = DataService(spreadsheet_id='1zNHLVX9V1TsckqhpzMWzkhDyLQ4bIDUmaJ6uKlTpJCM')
+    data = service.getData(range='Master Kate')
+    driver_data = list()
+    for row in data['values']:
+        if len(row) > 1:
+            if row[2] == 'Implementing' or row[2] == 'Live - In Trial' or row[2] == 'Paying Client' or row[2]=='Retired':
+                #print(row[4].split(','))
+                full_practice_names = row[4].split(',')
+                cleaned_data = list()
+                for name in full_practice_names:
+                    cleaned_data.append(str(name).strip())
+                cleaned_data.append(row[3])
+                driver_data.append(cleaned_data)
+    print(len(driver_data))
+    # print(driver_data)
+        
 
 if __name__ == '__main__':
     main()

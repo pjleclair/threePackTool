@@ -9,21 +9,24 @@
 from driver import Driver
 from dataService import DataService
 
+from time import sleep
+
 
 def runApplication():
     ''' runApplication imports data from Google Sheets and runs the driver
     Parameters: None
     Returns nothing
     '''
-
+    # MK: 1zNHLVX9V1TsckqhpzMWzkhDyLQ4bIDUmaJ6uKlTpJCM
+    # Test: 1ZbTHgQc5p61oDLcAHoj2iAWcfgYXJJibnCFMo9boShI
     # initialize data service, spreadsheet_id, and fails
-    spreadsheet_id='1ZbTHgQc5p61oDLcAHoj2iAWcfgYXJJibnCFMo9boShI'
+    spreadsheet_id='1zNHLVX9V1TsckqhpzMWzkhDyLQ4bIDUmaJ6uKlTpJCM'
     service = DataService(spreadsheet_id)
     fails = []
 
     # try to get data from Google Sheets, otherwise print error
     try:
-        data = service.getData()
+        data = service.getData(range='Master Kate')
     except:
         print("Error fetching data!")
         return
@@ -33,23 +36,55 @@ def runApplication():
         print('No new data in sheet!')
         return
     
+    # clean data from MK
+    driver_data = list()
+    for row in data['values']:
+        if len(row) > 1:
+            if row[2] == 'Implementing' or row[2] == 'Live - In Trial' or row[2] == 'Paying Client' or row[2]=='Retired':
+                #print(row[4].split(','))
+                full_practice_names = row[4].split(',')
+                cleaned_data = list()
+                for name in full_practice_names:
+                    cleaned_data.append(str(name).strip())
+                cleaned_data.append(row[3])
+                driver_data.append(cleaned_data)
+    # print(driver_data)
+    # driver_data = data['values']
+    
     # if there is data, initialize the driver and iterate through the client list, executing the driver each time
     # if the driver fails, print a message and append the client name to the fails list
     driver = Driver()
-    for practice in data['values'][1:]:
+    for practice in driver_data:
         try:
-            driver.drive(practice[0], practice[1], practice[2])
+            sleep(2)
+            driver.drive(practice[0], f'{practice[1]}, {practice[2]}', practice[3])
         except:
             print(f'Error creating threePack for {practice[0]}')
-            fails.append(practice[0])
+            fails.append(practice)
 
     print('Complete!')
 
-    # if there are fails, print them to the user
-    if len(fails) > 0:
+    attempts = 0
+    # if there are fails, print them to the user and retry
+    while len(fails) > 0 and attempts < 3:
         print('ThreePack encountered errors in the following...')
         for fail in fails:
             print(f'\t- {fail}')
+        print('Retrying...')
+        driver.quit()
+        driver = Driver()
+        fails_data = fails.copy()
+        fails.clear()
+        for practice in fails_data:
+            try:
+                driver.drive(practice[0], f'{practice[1]}, {practice[2]}', practice[3])
+            except:
+                print(f'Error creating threePack for {practice[0]}')
+                fails.append(practice)
+        attempts += 1
+    print('ThreePack encountered errors in the following...')
+    for fail in fails:
+        print(f'\t- {fail}')
     # after the script finishes, terminate the driver and clear the Google Sheet
     driver.quit()
     # service.clearSheet()

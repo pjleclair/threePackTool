@@ -35,9 +35,9 @@ class Driver():
         # initialize headless chrome driver
         chrome_options = Options()
         chrome_options.add_argument("--headless=new")
-        chrome_options.add_argument('--disable-canvas-aa')
-        chrome_options.add_argument('--disable-webgl')
-        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        # chrome_options.add_argument('--disable-canvas-aa')
+        # chrome_options.add_argument('--disable-webgl')
+        # chrome_options.add_argument('--disable-blink-features=AutomationControlled')
         self.driver = webdriver.Chrome(options=chrome_options) #options=chrome_options
         self.driver.set_window_size(1920,1080)
     
@@ -51,38 +51,59 @@ class Driver():
             - title: string (optional)
         Returns a dictionary with height, width, and screenshot_size keys
         '''
-        self.driver.get('http://www.google.com')
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'APjFqb')))
-        search_box = self.driver.find_element(By.ID,'APjFqb')
-        search_box.send_keys(f'best {specialty} {title} in {city_state}')
-        search_box.submit()
+        try:
+            self.driver.get('http://www.google.com')
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'APjFqb')))
+            search_box = self.driver.find_element(By.ID,'APjFqb')
+            search_box.send_keys(f'best {specialty} {title} in {city_state}')
+            search_box.submit()
+        except:
+            print('Error driving to Google and executing search')
+            raise RuntimeError
 
         # find places header to anchor screenshot location
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'YzSd')))
-        places = self.driver.find_element(By.CLASS_NAME, 'YzSd')
+        try:
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'YzSd')))
+            places = self.driver.find_element(By.CLASS_NAME, 'YzSd')
+        except:
+            print('Error finding Places header')
+            raise RuntimeError
 
         # move the driver to the element
-        scroll_script = "arguments[0].scrollIntoView();"
-        self.driver.execute_script(scroll_script, places)
-        self.driver.implicitly_wait(1)
+        try:
+            scroll_script = "arguments[0].scrollIntoView();"
+            self.driver.execute_script(scroll_script, places)
+            scroll_margin_script = "window.scrollBy(0, -60)"
+            self.driver.execute_script(scroll_margin_script)
+            self.driver.implicitly_wait(1)
+        except:
+            print('Error scrolling to the Places element')
+            raise RuntimeError
 
         # iterate through top listings to determine size of screenshot
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'VkpGBb')))
-        listings = self.driver.find_elements(By.CLASS_NAME, 'VkpGBb')
-        # location = places.location
+        # try:
+        #     WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'VkpGBb')))
+        #     listings = self.driver.find_elements(By.CLASS_NAME, 'VkpGBb')
+        #     # location = places.location
         height = 0
         width = 0
-        for listing in listings:
-            # print(f'Result: {listing.text}')
-            # print(f'\tSize: {listing.size}')
-            height += listing.size['height']
-            if listing.size['width'] > width:
-                width = listing.size['width']
-        height = height + places.size["height"]
+        #     for listing in listings:
+        #         # print(f'Result: {listing.text}')
+        #         # print(f'\tSize: {listing.size}')
+        #         height += listing.size['height']
+        #         if listing.size['width'] > width:
+        #             width = listing.size['width']
+        #     height = height + places.size["height"]
+        # except:
+        #     print('Error iterating through listings to determine screenshot size')
 
         # initialize screenshot
-        screenshot = self.driver.get_screenshot_as_png()
-        screenshot = Image.open(BytesIO(screenshot))
+        try:
+            screenshot = self.driver.get_screenshot_as_png()
+            screenshot = Image.open(BytesIO(screenshot))
+        except:
+            print('Error getting screenshot')
+            raise RuntimeError
 
         # # set crop values, crop screenshot
         # margin = 50
@@ -93,15 +114,19 @@ class Driver():
         # screenshot = screenshot.crop((left,top,right,bottom))
 
         # set filepath using current working directory, create directory for tenant if not existing, save screenshot
-        path = os.getcwd() + f'/images/{tenant}'
-        today = str(date.today())
-        img_path = f'{path}/3pack - {today}.png'
-        if not os.path.exists(path):
-            os.makedirs(path)
-        screenshot.save(img_path)
-        print(f'Saved threePack for {tenant}')
-        return {'height': height, 'width': width, 'screenshot_size': screenshot.size}
-    
+        try:
+            path = os.getcwd() + f'/images/{tenant}, {city_state}'
+            today = str(date.today())
+            img_path = f'{path}/3pack - {today}.png'
+            if not os.path.exists(path):
+                os.makedirs(path)
+            screenshot.save(img_path)
+            print(f'Saved threePack for {tenant}, {city_state}')
+            return {'height': height, 'width': width, 'screenshot_size': screenshot.size}
+        except:
+            print('Error saving screenshot')
+            raise RuntimeError
+
     def quit(self):
         self.driver.quit()
 
