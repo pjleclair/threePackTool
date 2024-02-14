@@ -40,7 +40,8 @@ def runApplication():
     driver_data = list()
     for row in data['values']:
         if len(row) > 1:
-            if row[2] == 'Implementing' or row[2] == 'Live - In Trial' or row[2] == 'Paying Client' or row[2]=='Retired':
+            status = row[2]
+            if status == 'Implementing' or status == 'Live - In Trial' or status == 'Paying Client' or status =='Retired':
                 #print(row[4].split(','))
                 full_practice_names = row[4].split(',')
                 cleaned_data = list()
@@ -53,14 +54,20 @@ def runApplication():
     
     # if there is data, initialize the driver and iterate through the client list, executing the driver each time
     # if the driver fails, print a message and append the client name to the fails list
+    err_count = 0
     driver = Driver()
     for practice in driver_data:
         try:
+            if err_count >= 3:
+                driver.quit()
+                driver = Driver()
+                err_count = 0
             sleep(2)
             driver.drive(practice[0], f'{practice[1]}, {practice[2]}', practice[3])
         except:
             print(f'Error creating threePack for {practice[0]}')
             fails.append(practice)
+            err_count += 1
 
     print('Complete!')
 
