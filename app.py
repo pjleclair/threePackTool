@@ -44,11 +44,10 @@ def runApplication():
             if status == 'Implementing' or status == 'Live - In Trial' or status == 'Paying Client' or status =='Retired':
                 #print(row[4].split(','))
                 full_practice_names = row[4].split(',')
-                cleaned_data = list()
-                for name in full_practice_names:
-                    cleaned_data.append(str(name).strip())
-                cleaned_data.append(row[3])
-                driver_data.append(cleaned_data)
+                city_state = full_practice_names[len(full_practice_names) - 2].strip() + ', ' + full_practice_names[len(full_practice_names) - 1]
+                practice_name = row[4]
+                specialty = row[3]
+                driver_data.append([practice_name, city_state.strip(), specialty])
     # print(driver_data)
     # driver_data = data['values']
     
@@ -63,7 +62,7 @@ def runApplication():
                 driver = Driver()
                 err_count = 0
             sleep(2)
-            driver.drive(practice[0], f'{practice[1]}, {practice[2]}', practice[3])
+            driver.drive(practice[0], practice[1], practice[2])
         except:
             print(f'Error creating threePack for {practice[0]}')
             fails.append(practice)

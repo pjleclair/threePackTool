@@ -115,13 +115,17 @@ class Driver():
 
         # set filepath using current working directory, create directory for tenant if not existing, save screenshot
         try:
-            path = os.getcwd() + f'/images/{tenant}, {city_state}'
+            path = os.getcwd() + f'/images/{tenant}'
             today = str(date.today())
             img_path = f'{path}/3pack - {today}.png'
+            illegal_chars = ['\\','/',':','*','?',"\"",'<','>','|','~','#','%','&','+','{','}','(',')']
+            for character in illegal_chars:
+                if (img_path.find(character) != -1):
+                    img_path.replace(character, '')
             if not os.path.exists(path):
                 os.makedirs(path)
             screenshot.save(img_path)
-            print(f'Saved threePack for {tenant}, {city_state}')
+            print(f'Saved threePack for {tenant}')
             return {'height': height, 'width': width, 'screenshot_size': screenshot.size}
         except:
             print('Error saving screenshot')

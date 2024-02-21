@@ -71,12 +71,19 @@ def main():
             if row[2] == 'Implementing' or row[2] == 'Live - In Trial' or row[2] == 'Paying Client' or row[2]=='Retired':
                 #print(row[4].split(','))
                 full_practice_names = row[4].split(',')
-                cleaned_data = list()
-                for name in full_practice_names:
-                    cleaned_data.append(str(name).strip())
-                cleaned_data.append(row[3])
-                driver_data.append(cleaned_data)
-    print(len(driver_data))
+                # print(full_practice_names)
+                # cleaned_data = list()
+                # for name in full_practice_names:
+                #     cleaned_data.append(str(name).strip())
+                city_state = full_practice_names[len(full_practice_names) - 2].strip() + ', ' + full_practice_names[len(full_practice_names) - 1]
+                practice_name = row[4]
+                specialty = row[3]
+                # cleaned_data.append(row[3])
+                driver_data.append([practice_name, city_state.strip(), specialty])
+                print(driver_data)
+    for practice in driver_data:
+        if "Charlotte Hodges" in practice:
+            print(practice)
     # print(driver_data)
         
 
